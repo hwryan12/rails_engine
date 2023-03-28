@@ -10,7 +10,6 @@ RSpec.describe 'Merchants API', type: :request do
       merchants = JSON.parse(response.body, symbolize_names: true)
       
       expect(merchants[:data].count).to eq(10)
-      
       expect(response).to have_http_status(200)
       expect(response).to have_http_status(:success)
 
@@ -50,7 +49,6 @@ RSpec.describe 'Merchants API', type: :request do
         expect(response).to have_http_status(404)
         expect(response.body).to include("Couldn't find Merchant with 'id'=#{merchant.id + 1}")
       end
-    end
-    
+    end   
   end
 end
