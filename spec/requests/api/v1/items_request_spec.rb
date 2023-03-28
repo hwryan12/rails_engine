@@ -59,4 +59,51 @@ RSpec.describe 'Items API', type: :request do
       end
     end   
   end
+
+  describe 'CREATE An Item' do    
+    context 'when the params are valid' do
+      it 'creates the item' do
+        merchant = create(:merchant) 
+        item_params = { 
+          name: 'New Item', 
+          description: 'New Description', 
+          unit_price: 100.00, 
+          merchant_id: merchant.id 
+        }
+        
+        post api_v1_items_path, params: item_params
+        
+        new_item = JSON.parse(response.body, symbolize_names: true)[:data]
+
+        expect(response).to have_http_status(201)
+        expect(response).to have_http_status(:success)
+        
+        expect(new_item).to have_key(:id)
+        expect(new_item[:id]).to be_a(String)
+        expect(new_item[:attributes]).to have_key(:name)
+        expect(new_item[:attributes][:name]).to be_a(String)
+        expect(new_item[:attributes]).to have_key(:description)
+        expect(new_item[:attributes][:description]).to be_a(String)
+        expect(new_item[:attributes]).to have_key(:unit_price)
+        expect(new_item[:attributes][:unit_price]).to be_a(Float)
+      end
+    end
+
+    context 'when the params are not valid' do
+      it 'does not creates the item' do
+        merchant = create(:merchant) 
+        item_params = { 
+          name: 'New Item',
+          description: 'New Description', 
+          unit_price: nil, 
+          merchant_id: merchant.id 
+        }
+        
+        post api_v1_items_path, params: item_params
+        
+        expect(response).to have_http_status(422)
+        expect(response.body).to include("Unit price can't be blank")
+      end
+    end
+  end
 end
