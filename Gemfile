@@ -48,10 +48,12 @@ group :development, :test do
   gem 'orderly'
   gem 'factory_bot_rails'
   gem "faker"
+  gem "pry"
 end
 
 group :development do
   # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
   # gem "spring"
 end
+gem "jsonapi-serializer"
 
