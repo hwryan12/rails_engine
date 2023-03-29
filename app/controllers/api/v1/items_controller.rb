@@ -22,13 +22,17 @@ class Api::V1::ItemsController < ApplicationController
       item.update!(item_params)
       render json: ItemSerializer.new(item), status: 200
     else
-      render json: { errors: item.errors.full_messages }, status: 422
+      render json: { errors: item.errors.full_messages }, status: 404
     end
   end
-  
+
+  def destroy
+    item = Item.find(params[:id])
+    item.destroy
+    render json: { data: { id: item.id, type: "item" } }, status: 204
+  end
 
   private
-
   def item_params
     params.permit(:id, :name, :description, :unit_price, :merchant_id)
   end
