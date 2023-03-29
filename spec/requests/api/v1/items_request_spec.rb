@@ -106,4 +106,40 @@ RSpec.describe 'Items API', type: :request do
       end
     end
   end
+
+  describe 'EDIT An Item' do
+    context 'when the params are valid' do
+      it 'updates the item' do
+        merchant = create(:merchant) 
+        item = create(:item)
+        updated_item_params = {
+          id: item.id,
+          name: 'Updated Item',
+          unit_price: 12.34,
+          merchant_id: merchant.id 
+        }
+        # Description is not included in the params, so it should not be updated
+
+        put api_v1_item_path(item), params: updated_item_params
+
+        expect(response).to have_http_status(200)
+        expect(JSON.parse(response.body)['data']['attributes']['name']).to eq(updated_item_params[:name])
+        expect(JSON.parse(response.body)['data']['attributes']['unit_price']).to eq(updated_item_params[:unit_price])
+      end
+    end
+  
+    # Sad Path test for when the update params are not valid, skipped for now
+
+    # context 'when the params are not valid' do
+    #   it 'does not update the item' do
+    #     item = create(:item)
+    #     updated_item_params = { name: nil }
+
+    #     put api_v1_item_path(item), params: updated_item_params
+  
+    #     expect(response).to have_http_status(422)
+    #     expect(JSON.parse(response.body)['errors']).to include("Name can't be blank")
+    #   end
+    # end
+  end 
 end
