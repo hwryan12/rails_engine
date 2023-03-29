@@ -15,6 +15,16 @@ class Api::V1::ItemsController < ApplicationController
       render json: { errors: item.errors.full_messages }, status: 422
     end
   end
+
+  def update
+    item = Item.find(params[:id])
+    if item.valid?
+      item.update!(item_params)
+      render json: ItemSerializer.new(item), status: 200
+    else
+      render json: { errors: item.errors.full_messages }, status: 422
+    end
+  end
   
 
   private
