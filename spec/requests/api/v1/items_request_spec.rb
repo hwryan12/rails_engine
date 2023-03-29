@@ -137,9 +137,21 @@ RSpec.describe 'Items API', type: :request do
 
     #     put api_v1_item_path(item), params: updated_item_params
   
-    #     expect(response).to have_http_status(422)
+    #     expect(response).to have_http_status(404)
     #     expect(JSON.parse(response.body)['errors']).to include("Name can't be blank")
     #   end
     # end
-  end 
+  end
+
+  describe 'DELETE An Item' do
+    it 'deletes the item' do
+      merchant = create(:merchant) 
+      item = create(:item)
+
+      delete "/api/v1/items/#{item.id}"
+
+      expect(response).to have_http_status(204)
+      expect { item.reload }.to raise_error ActiveRecord::RecordNotFound
+    end
+  end
 end
