@@ -8,22 +8,14 @@ class Api::V1::ItemsController < ApplicationController
   end 
 
   def create
-    item = Item.create(item_params)
-    if item.valid?
-      render json: ItemSerializer.new(item), status: 201
-    else
-      render json: { errors: item.errors.full_messages }, status: 422
-    end
+    item = Item.create!(item_params)
+    render json: ItemSerializer.new(item), status: 201
   end
 
   def update
     item = Item.find(params[:id])
-    if item.valid?
-      item.update!(item_params)
-      render json: ItemSerializer.new(item), status: 200
-    else
-      render json: { errors: item.errors.full_messages }, status: 404
-    end
+    item.update!(item_params)
+    render json: ItemSerializer.new(item), status: 200
   end
 
   def destroy
