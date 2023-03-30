@@ -162,16 +162,89 @@ RSpec.describe 'Items API', type: :request do
       create(:item, name: "Ring Pop", description: "A ring that tastes like candy", unit_price: 2.00, merchant: merchant)
       create(:item, name: "Air Fryer", description: "Air fries your food", unit_price: 74.99, merchant: merchant)
 
-      get "/api/v1/items/find?name=ring"
+      get "/api/v1/items/find_all?name=ring"
 
       expect(response).to have_http_status(200)
       
       items = JSON.parse(response.body, symbolize_names: true)[:data]
+
       expect(items.count).to eq(2)
       
       items.each do |item|
         expect(item[:attributes][:name]).to include("Ring")
       end
+    end
+  end
+
+  describe 'when searching by price' do
+    context 'when searching by min_price' do
+      it "returns the items with in the price range parameters" do
+        merchant = create(:merchant)
+        create(:item, name: "Magic Ring", description: "A ring that makes you invisible", unit_price: 1000.00, merchant: merchant)
+        create(:item, name: "Ring Pop", description: "A ring that tastes like candy", unit_price: 2.00, merchant: merchant)
+        create(:item, name: "Air Fryer", description: "Air fries your food", unit_price: 149.99, merchant: merchant)
+        create(:item, name: "Chicken Wings", description: "Fried chicken wings", unit_price: 10.00, merchant: merchant)
+
+        get "/api/v1/items/find_all?min_price=100"
+
+        expect(response).to have_http_status(200)
+        
+        items = JSON.parse(response.body, symbolize_names: true)[:data]
+    
+        expect(items.count).to eq(2)
+      end
+    end
+  end
+
+  context 'when searching by max_price' do
+    it "returns the items within the price range parameters" do
+      merchant = create(:merchant)
+      create(:item, name: "Magic Ring", description: "A ring that makes you invisible", unit_price: 1000.00, merchant: merchant)
+      create(:item, name: "Ring Pop", description: "A ring that tastes like candy", unit_price: 2.00, merchant: merchant)
+      create(:item, name: "Air Fryer", description: "Air fries your food", unit_price: 149.99, merchant: merchant)
+      create(:item, name: "Chicken Wings", description: "Fried chicken wings", unit_price: 10.00, merchant: merchant)
+      
+      get "/api/v1/items/find_all?max_price=10"
+
+      expect(response).to have_http_status(200)
+      
+      items = JSON.parse(response.body, symbolize_names: true)[:data]
+
+      expect(items.count).to eq(2)
+    end
+  end
+
+  context 'when searching by both min_price and max_price' do
+    it "returns the items within the price range parameters" do
+      merchant = create(:merchant)
+      create(:item, name: "Magic Ring", description: "A ring that makes you invisible", unit_price: 1000.00, merchant: merchant)
+      create(:item, name: "Ring Pop", description: "A ring that tastes like candy", unit_price: 2.00, merchant: merchant)
+      create(:item, name: "Air Fryer", description: "Air fries your food", unit_price: 149.99, merchant: merchant)
+      create(:item, name: "Chicken Wings", description: "Fried chicken wings", unit_price: 10.00, merchant: merchant)
+      
+      get "/api/v1/items/find_all?min_price=2&max_price=999"
+
+      expect(response).to have_http_status(200)
+      
+      items = JSON.parse(response.body, symbolize_names: true)[:data]
+      expect(items.count).to eq(3)
+    end
+  end
+
+  context 'when searching by name and min_price' do
+    it "returns an error message" do
+      merchant = create(:merchant)
+      create(:item, name: "Magic Ring", description: "A ring that makes you invisible", unit_price: 1000.00, merchant: merchant)
+      create(:item, name: "Ring Pop", description: "A ring that tastes like candy", unit_price: 2.00, merchant: merchant)
+      create(:item, name: "Air Fryer", description: "Air fries your food", unit_price: 149.99, merchant: merchant)
+      create(:item, name: "Chicken Wings", description: "Fried chicken wings", unit_price: 10.00, merchant: merchant)
+      
+      get "/api/v1/items/find_all?name=ring&min_price=999"
+
+      expect(response).to have_http_status(400)
+      
+      error_message = JSON.parse(response.body, symbolize_names: true)[:error]
+      expect(error_message).to eq("Name and price parameters cannot be sent together")
     end
   end
 end
