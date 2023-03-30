@@ -154,4 +154,24 @@ RSpec.describe 'Items API', type: :request do
       expect { item.reload }.to raise_error ActiveRecord::RecordNotFound
     end
   end
+
+  describe 'when searching by name' do
+    it "returns the first matching merchant in case-insensitive alphabetical order" do
+      merchant = create(:merchant)
+      create(:item, name: "Magic Ring", description: "A ring that makes you invisible", unit_price: 100.00, merchant: merchant)
+      create(:item, name: "Ring Pop", description: "A ring that tastes like candy", unit_price: 2.00, merchant: merchant)
+      create(:item, name: "Air Fryer", description: "Air fries your food", unit_price: 74.99, merchant: merchant)
+
+      get "/api/v1/items/find?name=ring"
+
+      expect(response).to have_http_status(200)
+      
+      items = JSON.parse(response.body, symbolize_names: true)[:data]
+      expect(items.count).to eq(2)
+      
+      items.each do |item|
+        expect(item[:attributes][:name]).to include("Ring")
+      end
+    end
+  end
 end

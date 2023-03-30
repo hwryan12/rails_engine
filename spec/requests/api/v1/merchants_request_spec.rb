@@ -55,13 +55,14 @@ RSpec.describe 'Merchants API', type: :request do
     context "when searching by name" do
       it "returns the first matching merchant in case-insensitive alphabetical order" do
         create(:merchant, name: "Turing School")
+        create(:merchant, name: "Ring World")
         create(:merchant, name: "Big Al's Toy Barn")
         
         get "/api/v1/merchants/find?name=ring"
 
         merchant = JSON.parse(response.body, symbolize_names: true)[:data]
         expect(response).to have_http_status(200)
-        expect(merchant[:attributes][:name]).to eq("Turing School")
+        expect(merchant[:attributes][:name]).to eq("Ring World")
       end
 
       # Sad Path testing should be added here once core functionality is complete
