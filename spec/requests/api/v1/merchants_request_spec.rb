@@ -8,7 +8,8 @@ RSpec.describe 'Merchants API', type: :request do
       get api_v1_merchants_path
 
       merchants = JSON.parse(response.body, symbolize_names: true)
-      
+
+      expect(merchants[:data]).to be_an(Array)
       expect(merchants[:data].count).to eq(10)
       expect(response).to have_http_status(200)
       expect(response).to have_http_status(:success)
@@ -49,6 +50,21 @@ RSpec.describe 'Merchants API', type: :request do
         expect(response).to have_http_status(404)
         expect(response.body).to include("Couldn't find Merchant with 'id'=#{merchant.id + 1}")
       end
-    end   
+    end
+
+    context "when searching by name" do
+      it "returns the first matching merchant in case-insensitive alphabetical order" do
+        create(:merchant, name: "Turing School")
+        create(:merchant, name: "Big Al's Toy Barn")
+        
+        get "/api/v1/merchants/find?name=ring"
+
+        merchant = JSON.parse(response.body, symbolize_names: true)[:data]
+        expect(response).to have_http_status(200)
+        expect(merchant[:attributes][:name]).to eq("Turing School")
+      end
+
+      # Sad Path testing should be added here once core functionality is complete
+    end
   end
 end
