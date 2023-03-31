@@ -64,6 +64,18 @@ RSpec.describe 'Merchants API', type: :request do
         expect(response).to have_http_status(200)
         expect(merchant[:attributes][:name]).to eq("Ring World")
       end
+
+      it "returns an empty array if the name is not found" do
+        create(:merchant, name: "Turing School")
+        create(:merchant, name: "Ring World")
+        create(:merchant, name: "Big Al's Toy Barn")
+        
+        get "/api/v1/merchants/find?name=Zeb"
+
+        merchant = JSON.parse(response.body, symbolize_names: true)
+        expect(response).to have_http_status(200)
+        expect(merchant[:data]).to eq({})
+      end
     end
   end
 end

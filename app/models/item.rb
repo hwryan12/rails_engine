@@ -1,8 +1,6 @@
 class Item < ApplicationRecord
   validates_presence_of :name, :description, :unit_price, :merchant_id 
   belongs_to :merchant
-  has_many :invoice_items, dependent: :delete_all
-  has_many :invoices, through: :invoice_items
 
   def self.price_search(min_price, max_price)
     if min_price.present? && max_price.present?
