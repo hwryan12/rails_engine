@@ -1,12 +1,12 @@
 require 'rails_helper'
 
-RSpec.describe "Item Items API", type: :request do
+RSpec.describe "Items Merchant API", type: :request do
   describe "GET the Merchant for a Given Item ID" do
     it "returns the merchant the item belongs to" do
       merchant = create(:merchant)
       item = create(:item, merchant: merchant)
       
-      get "/api/v1/items/#{item.id}/merchant"
+      get api_v1_item_merchant_index_path(item)
       
       expect(response).to have_http_status(200)
       expect(response).to have_http_status(:success)
@@ -19,6 +19,4 @@ RSpec.describe "Item Items API", type: :request do
       expect(merchant_json[:attributes][:name]).to be_a(String)
     end
   end
-
-  # Come back to this for sad path test once core functionality is complete 
 end
