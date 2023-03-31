@@ -64,8 +64,6 @@ RSpec.describe 'Merchants API', type: :request do
         expect(response).to have_http_status(200)
         expect(merchant[:attributes][:name]).to eq("Ring World")
       end
-
-      # Sad Path testing should be added here once core functionality is complete
     end
   end
 end
